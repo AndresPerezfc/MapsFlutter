@@ -8,28 +8,37 @@ class HomeState extends Equatable {
   final bool gpsEnable;
 
   final Map<MarkerId, Marker> markers;
+  final Map<PolylineId, Polyline> polylines;
 
   HomeState(
-      {this.myLocation, this.loading = true, this.markers, this.gpsEnable});
+      {this.myLocation,
+      this.loading = true,
+      this.markers,
+      this.gpsEnable,
+      this.polylines});
 
   static HomeState get initialState => new HomeState(
       myLocation: null,
       loading: true,
       markers: Map(),
-      gpsEnable: Platform.isIOS);
+      gpsEnable: Platform.isIOS,
+      polylines: Map());
 
   HomeState copyWith(
       {LatLng myLocation,
       bool loading,
       Map<MarkerId, Marker> markers,
-      bool gpsEnable}) {
+      bool gpsEnable,
+      Map<PolylineId, Polyline> polylines}) {
     return HomeState(
         myLocation: myLocation ?? this.myLocation,
         loading: loading ?? this.loading,
         markers: markers ?? this.markers,
-        gpsEnable: gpsEnable ?? this.gpsEnable);
+        gpsEnable: gpsEnable ?? this.gpsEnable,
+        polylines: polylines ?? this.polylines);
   }
 
   @override
-  List<Object> get props => [myLocation, loading, markers, gpsEnable];
+  List<Object> get props =>
+      [myLocation, loading, markers, gpsEnable, polylines];
 }

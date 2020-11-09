@@ -25,6 +25,9 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
   StreamSubscription<Position> _subscription;
   StreamSubscription<ServiceStatus> _subscriptionGpsStatus;
 
+  Polyline myRoute = Polyline(
+      polylineId: PolylineId('my_route'), color: Color(0xff5abd8c), width: 6);
+
   Future<GoogleMapController> get _mapController async {
     return await _completer.future;
   }
@@ -77,13 +80,29 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
   @override
   Stream<HomeState> mapEventToState(HomeEvents event) async* {
     if (event is OnMyLocationUpdate) {
-      yield this.state.copyWith(loading: false, myLocation: event.location);
+      yield* this._mapOnMyLocationUpdate(event);
     } else if (event is onGpsEnable) {
       yield this.state.copyWith(gpsEnable: event.enabled);
     } else if (event is OnMapTap) {
       yield* this._mapOnMapTap(event);
     }
   }
+
+//---------------------------------------------------------------------------------
+  Stream<HomeState> _mapOnMyLocationUpdate(OnMyLocationUpdate event) async* {
+    List<LatLng> points = List<LatLng>.from(this.myRoute.points);
+    points.add(event.location);
+
+    this.myRoute = this.myRoute.copyWith(pointsParam: points);
+    print("Puntos ${this.myRoute.points.length}");
+
+    Map<PolylineId, Polyline> polylines = Map();
+    polylines[this.myRoute.polylineId] = this.myRoute;
+
+    yield this.state.copyWith(
+        loading: false, myLocation: event.location, polylines: polylines);
+  }
+//---------------------------------------------------------------------------------
 
   Stream<HomeState> _mapOnMapTap(OnMapTap event) async* {
     final markerId = MarkerId(this.state.markers.length.toString());
