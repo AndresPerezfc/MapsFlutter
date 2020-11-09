@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps/blocs/pages/home/bloc.dart';
+import 'package:google_maps/utils/extras.dart';
 import 'package:google_maps/utils/map_style.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'home_events.dart';
@@ -61,9 +63,15 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
         title: "Hola Marcador ${markerId.value}",
         snippet: "La dirección es buena",
       );
+
+      final Uint8List bytes =
+          await loadAsset('assets/car-pin.png', width: 50, height: 95);
+      final customIcon = BitmapDescriptor.fromBytes(bytes);
+
       final marker = Marker(
           markerId: markerId,
           position: event.location,
+          icon: customIcon,
           onTap: () {
             print("## MARCADOR  ${markerId.value} ##");
           },
