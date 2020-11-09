@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps/blocs/pages/home/bloc.dart';
@@ -48,13 +49,34 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
     }
   }
 
-  @override
-  HomeState get initialState => HomeState();
+  HomeState get initialState => HomeState.initialState;
 
   @override
   Stream<HomeState> mapEventToState(HomeEvents event) async* {
     if (event is OnMyLocationUpdate) {
       yield this.state.copyWith(loading: false, myLocation: event.location);
+    } else if (event is OnMapTap) {
+      final markerId = MarkerId(this.state.markers.length.toString());
+      final info = InfoWindow(
+        title: "Hola Marcador ${markerId.value}",
+        snippet: "La dirección es buena",
+      );
+      final marker = Marker(
+          markerId: markerId,
+          position: event.location,
+          onTap: () {
+            print("## MARCADOR  ${markerId.value} ##");
+          },
+          draggable: true,
+          onDragEnd: (newPosition) {
+            print(
+                "## MARCADOR Nueva Posicion  ${markerId.value} ##  $newPosition");
+          },
+          infoWindow: info);
+
+      final markers = Map<MarkerId, Marker>.from(this.state.markers);
+      markers[markerId] = marker;
+      yield this.state.copyWith(markers: markers);
     }
   }
 }

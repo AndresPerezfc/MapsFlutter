@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final HomeBloc _bloc = HomeBloc(HomeState());
+  final HomeBloc _bloc = HomeBloc(HomeState.initialState);
 
   @override
   void initState() {
@@ -55,6 +55,11 @@ class _HomePageState extends State<HomePage> {
                     initialCameraPosition: initialPosition,
                     zoomControlsEnabled: false,
                     compassEnabled: false,
+                    onTap: (LatLng position) {
+                      print(":):) $position");
+                      this._bloc.add(OnMapTap(position));
+                    },
+                    markers: state.markers.values.toSet(),
                     myLocationEnabled: true,
                     myLocationButtonEnabled: true,
                     onMapCreated: (GoogleMapController controller) {

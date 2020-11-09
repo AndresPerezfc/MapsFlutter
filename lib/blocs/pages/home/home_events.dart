@@ -7,3 +7,9 @@ class OnMyLocationUpdate extends HomeEvents {
 
   OnMyLocationUpdate(this.location);
 }
+
+class OnMapTap extends HomeEvents {
+  final LatLng location;
+
+  OnMapTap(this.location);
+}
