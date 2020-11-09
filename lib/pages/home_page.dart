@@ -21,6 +21,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     this._init();
+    print("Holas");
   }
 
   Future<GoogleMapController> get _mapController async {
