@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps/utils/map_style.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../blocs/pages/home/bloc.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = "HomePage";
@@ -12,39 +14,55 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final Completer<GoogleMapController> _completer = Completer();
-
-  final CameraPosition _initialPosition =
-      CameraPosition(target: LatLng(11.2202012, -74.1827116), zoom: 15);
+  final HomeBloc _bloc = HomeBloc(HomeState());
 
   @override
   void initState() {
     super.initState();
-    this._init();
+
     print("Holas");
   }
 
-  Future<GoogleMapController> get _mapController async {
-    return await _completer.future;
-  }
-
-  _init() async {
-    (await _mapController).setMapStyle(jsonEncode(mapaStyle));
+  @override
+  void dispose() {
+    _bloc.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        child: GoogleMap(
-          initialCameraPosition: _initialPosition,
-          zoomControlsEnabled: false,
-          compassEnabled: false,
-          onMapCreated: (GoogleMapController controller) {
-            _completer.complete(controller);
-          },
+    return BlocProvider.value(
+      value: _bloc,
+      child: Scaffold(
+        body: SafeArea(
+          child: Container(
+              width: double.infinity,
+              height: double.infinity,
+              child: BlocBuilder<HomeBloc, HomeState>(
+                builder: (_, state) {
+                  if (state.loading) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+
+                  final CameraPosition initialPosition =
+                      CameraPosition(target: state.myLocation, zoom: 15);
+
+                  return GoogleMap(
+                    initialCameraPosition: initialPosition,
+                    zoomControlsEnabled: false,
+                    compassEnabled: false,
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: true,
+                    onMapCreated: (GoogleMapController controller) {
+                      this._bloc.setMapController(controller);
+                    },
+                  );
+                },
+              )),
         ),
       ),
     );
