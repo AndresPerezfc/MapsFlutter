@@ -64,8 +64,13 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
         snippet: "La dirección es buena",
       );
 
-      final Uint8List bytes =
-          await loadAsset('assets/car-pin.png', width: 50, height: 95);
+      //final Uint8List bytes =
+      //  await loadAsset('assets/car-pin.png', width: 50, height: 95);
+
+      final Uint8List bytes = await loadimageFromNetwork(
+          'https://cdn.iconscout.com/icon/free/png-256/google-470-675827.png',
+          width: 50,
+          height: 95);
       final customIcon = BitmapDescriptor.fromBytes(bytes);
 
       final marker = Marker(
