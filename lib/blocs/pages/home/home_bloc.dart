@@ -17,7 +17,8 @@ import 'dart:io' show Platform;
 class HomeBloc extends Bloc<HomeEvents, HomeState> {
   Geolocator _geolocator = Geolocator();
   final LocationPermissions _locationPermissions = LocationPermissions();
-  final Completer<GoogleMapController> _completer = Completer();
+
+  Completer<GoogleMapController> _completer = Completer();
   final LocationOptions _locationOptions =
       LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 10);
 
@@ -42,9 +43,13 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
   _init() async {
     _subscription = _geolocator
         .getPositionStream(_locationOptions)
-        .listen((Position position) {
+        .listen((Position position) async {
       if (position != null) {
-        add(OnMyLocationUpdate(LatLng(position.latitude, position.longitude)));
+        final newPosition = LatLng(position.latitude, position.longitude);
+        add(OnMyLocationUpdate(newPosition));
+
+        final CameraUpdate cameraUpdate = CameraUpdate.newLatLng(newPosition);
+        await (await _mapController).animateCamera(cameraUpdate);
       }
     });
 
@@ -59,10 +64,12 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
   }
 
   void setMapController(GoogleMapController controller) {
-    if (!_completer.isCompleted) {
-      _completer.complete(controller);
-      controller.setMapStyle(jsonEncode(mapaStyle));
+    if (_completer.isCompleted) {
+      _completer = Completer();
     }
+
+    _completer.complete(controller);
+    controller.setMapStyle(jsonEncode(mapaStyle));
   }
 
   HomeState get initialState => HomeState.initialState;
