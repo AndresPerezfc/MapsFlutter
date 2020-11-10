@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps/pages/custom_painter_demo_page.dart';
 import 'package:google_maps/pages/home_page.dart';
 import 'package:google_maps/pages/request_permission_page.dart';
 import 'package:google_maps/pages/splash_page.dart';
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: SplashPage(),
+      home: CustomPainterDemoPage(),
       routes: {
         HomePage.routeName: (_) => HomePage(),
         RequestPermissionPage.routeName: (_) => RequestPermissionPage()
