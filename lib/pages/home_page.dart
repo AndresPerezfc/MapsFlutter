@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
                   }
 
                   final CameraPosition initialPosition =
-                      CameraPosition(target: state.myLocation, zoom: 16);
+                      CameraPosition(target: state.myLocation, zoom: 17);
 
                   return GoogleMap(
                     initialCameraPosition: initialPosition,
@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
                     },
                     markers: state.markers.values.toSet(),
                     polylines: state.polylines.values.toSet(),
-                    myLocationEnabled: true,
+                    myLocationEnabled: false,
                     myLocationButtonEnabled: true,
                     onMapCreated: (GoogleMapController controller) {
                       this._bloc.setMapController(controller);
