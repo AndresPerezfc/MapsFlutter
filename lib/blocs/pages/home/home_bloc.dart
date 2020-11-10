@@ -99,9 +99,21 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
       yield this.state.copyWith(gpsEnable: event.enabled);
     } else if (event is GoToPlace) {
       final history = Map<String, Place>.from(this.state.history);
+      final MarkerId markerId = MarkerId('place');
+      final Marker marker = Marker(
+          markerId: markerId,
+          position: event.place.position,
+          infoWindow: InfoWindow(
+              title: event.place.title,
+              snippet: event.place.vicinity.replaceAll('<br/>', ' - ')));
+
+      final markers = Map<MarkerId, Marker>.from(this.state.markers);
+      markers[markerId] = marker;
       if (history[event.place.id] == null) {
         history[event.place.id] = event.place;
-        yield this.state.copyWith(history: history);
+        yield this.state.copyWith(history: history, markers: markers);
+      } else {
+        yield this.state.copyWith(markers: markers);
       }
     }
   }
