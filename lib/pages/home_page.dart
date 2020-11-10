@@ -59,21 +59,34 @@ class _HomePageState extends State<HomePage> {
                   final CameraPosition initialPosition =
                       CameraPosition(target: state.myLocation, zoom: 17);
 
-                  return GoogleMap(
-                    initialCameraPosition: initialPosition,
-                    zoomControlsEnabled: false,
-                    compassEnabled: false,
-                    onTap: (LatLng position) {
-                      print(":):) $position");
-                      this._bloc.add(OnMapTap(position));
-                    },
-                    markers: state.markers.values.toSet(),
-                    polylines: state.polylines.values.toSet(),
-                    myLocationEnabled: false,
-                    myLocationButtonEnabled: true,
-                    onMapCreated: (GoogleMapController controller) {
-                      this._bloc.setMapController(controller);
-                    },
+                  return Stack(
+                    children: [
+                      GoogleMap(
+                        initialCameraPosition: initialPosition,
+                        zoomControlsEnabled: false,
+                        compassEnabled: false,
+                        onTap: (LatLng position) {
+                          print(":):) $position");
+                          this._bloc.add(OnMapTap(position));
+                        },
+                        markers: state.markers.values.toSet(),
+                        polylines: state.polylines.values.toSet(),
+                        myLocationEnabled: false,
+                        myLocationButtonEnabled: false,
+                        onMapCreated: (GoogleMapController controller) {
+                          this._bloc.setMapController(controller);
+                        },
+                      ),
+                      Positioned(
+                          bottom: 15,
+                          right: 15,
+                          child: FloatingActionButton(
+                            onPressed: () {
+                              _bloc.goToMyPosition();
+                            },
+                            child: Icon(Icons.gps_fixed),
+                          ))
+                    ],
                   );
                 },
               )),
