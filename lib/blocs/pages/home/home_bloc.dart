@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps/blocs/pages/home/bloc.dart';
 import 'package:google_maps/models/place.dart';
+import 'package:google_maps/utils/extras.dart';
 
 import 'package:google_maps/utils/map_style.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -100,6 +102,7 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
     } else if (event is GoToPlace) {
       final history = Map<String, Place>.from(this.state.history);
       final MarkerId markerId = MarkerId('place');
+
       final Marker marker = Marker(
           markerId: markerId,
           position: event.place.position,
@@ -109,6 +112,17 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
 
       final markers = Map<MarkerId, Marker>.from(this.state.markers);
       markers[markerId] = marker;
+
+      /*final Uint8List bytes = await placeToMarker(event.place);
+
+      final Marker marker = Marker(
+          markerId: markerId,
+          position: event.place.position,
+          icon: BitmapDescriptor.fromBytes(bytes)); 
+
+      final markers = Map<MarkerId, Marker>.from(this.state.markers);
+      markers[markerId] = marker;*/
+
       if (history[event.place.id] == null) {
         history[event.place.id] = event.place;
         yield this.state.copyWith(history: history, markers: markers);
