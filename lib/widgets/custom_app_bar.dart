@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html/style.dart';
 import 'package:google_maps/api/search_api.dart';
 import 'package:google_maps/blocs/pages/home/bloc.dart';
 import 'package:google_maps/models/place.dart';
@@ -85,7 +87,11 @@ class SearchPlacesDelegate extends SearchDelegate {
                 itemBuilder: (__, index) {
                   final Place place = snapshot.data[index];
                   return ListTile(
-                    title: Text(place.title),
+                    title: Text(
+                      place.title,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(place.vicinity.replaceAll('<br/>', ' - ')),
                   );
                 },
                 itemCount: snapshot.data.length,
