@@ -30,8 +30,9 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
                     ],
                   ),
                   onPressed: () async {
+                    final List<Place> history = state.history.values.toList();
                     SearchPlacesDelegate delegate =
-                        SearchPlacesDelegate(state.myLocation);
+                        SearchPlacesDelegate(state.myLocation, history);
                     final Place place = await showSearch<Place>(
                         context: context, delegate: delegate);
                     if (place != null) {
@@ -53,9 +54,10 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
 
 class SearchPlacesDelegate extends SearchDelegate<Place> {
   final LatLng at;
+  final List<Place> history;
   final SearchApi _api = SearchApi.instance;
 
-  SearchPlacesDelegate(this.at);
+  SearchPlacesDelegate(this.at, this.history);
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
@@ -101,9 +103,9 @@ class SearchPlacesDelegate extends SearchDelegate<Place> {
                 itemCount: snapshot.data.length,
               );
             } else if (snapshot.hasError) {
-              return Text("Error");
+              return Center(child: Text("Error"));
             }
-            return CircularProgressIndicator();
+            return Center(child: CircularProgressIndicator());
           });
     }
     return Text("query invalida");
@@ -111,6 +113,34 @@ class SearchPlacesDelegate extends SearchDelegate<Place> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return Text("Texto de prueba");
+    List<Place> history = this.history;
+
+    if (this.query.trim().length > 0) {
+      final tmp = this.query.toLowerCase();
+      history = history.where((element) {
+        if (element.title.toLowerCase().contains(tmp)) {
+          return true;
+        } else if (element.title.toLowerCase().contains(tmp)) {
+          return true;
+        }
+        return false;
+      }).toList();
+    }
+
+    return ListView.builder(
+      itemBuilder: (_, index) {
+        final Place place = history[index];
+        return ListTile(
+          leading: Icon(Icons.history),
+          onTap: () => this.close(context, place),
+          title: Text(
+            place.title,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text(place.vicinity.replaceAll('<br/>', ' - ')),
+        );
+      },
+      itemCount: history.length,
+    );
   }
 }

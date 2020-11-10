@@ -73,6 +73,7 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
   //-------------------------------------------------------------------
 
   goToPlace(Place place) async {
+    add(GoToPlace(place));
     final CameraUpdate cameraUpdate = CameraUpdate.newLatLng(place.position);
     await (await _mapController).animateCamera(cameraUpdate);
   }
@@ -96,6 +97,12 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
       yield* this._mapOnMyLocationUpdate(event);
     } else if (event is OnGpsEnable) {
       yield this.state.copyWith(gpsEnable: event.enabled);
+    } else if (event is GoToPlace) {
+      final history = Map<String, Place>.from(this.state.history);
+      if (history[event.place.id] == null) {
+        history[event.place.id] = event.place;
+        yield this.state.copyWith(history: history);
+      }
     }
   }
 
