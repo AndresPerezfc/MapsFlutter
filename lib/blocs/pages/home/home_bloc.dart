@@ -20,15 +20,11 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
 
   Completer<GoogleMapController> _completer = Completer();
 
-  final Completer<Marker> _myPositionMarker = Completer();
   final LocationOptions _locationOptions =
       LocationOptions(accuracy: LocationAccuracy.high, distanceFilter: 10);
 
   StreamSubscription<Position> _subscription;
   StreamSubscription<ServiceStatus> _subscriptionGpsStatus;
-
-  Polyline myRoute = Polyline(
-      polylineId: PolylineId('my_route'), color: Color(0xff5abd8c), width: 6);
 
   Future<GoogleMapController> get _mapController async {
     return await _completer.future;
@@ -47,8 +43,6 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
 
 //-------------------------------------------------------------------
   _init() async {
-    this._loadCarPin();
-
     _subscription = _geolocator
         .getPositionStream(_locationOptions)
         .listen((Position position) async {
@@ -79,15 +73,6 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
 
   //-------------------------------------------------------------------
 
-  _loadCarPin() async {
-    final Uint8List bytes = await loadAsset("assets/car-pin.png", width: 40);
-    final marker = Marker(
-        markerId: MarkerId('my_position_marker'),
-        icon: BitmapDescriptor.fromBytes(bytes),
-        anchor: Offset(0.5, 0.5));
-    this._myPositionMarker.complete(marker);
-  }
-
   //-------------------------------------------------------------------
 
   void setMapController(GoogleMapController controller) {
@@ -107,74 +92,16 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
       yield* this._mapOnMyLocationUpdate(event);
     } else if (event is onGpsEnable) {
       yield this.state.copyWith(gpsEnable: event.enabled);
-    } else if (event is OnMapTap) {
-      yield* this._mapOnMapTap(event);
     }
   }
 
 //---------------------------------------------------------------------------------
   Stream<HomeState> _mapOnMyLocationUpdate(OnMyLocationUpdate event) async* {
-    List<LatLng> points = List<LatLng>.from(this.myRoute.points);
-    points.add(event.location);
-
-    this.myRoute = this.myRoute.copyWith(pointsParam: points);
-    print("Puntos ${this.myRoute.points.length}");
-
-    Map<PolylineId, Polyline> polylines = Map();
-    polylines[this.myRoute.polylineId] = this.myRoute;
-
-    final markers = Map<MarkerId, Marker>.from(this.state.markers);
-
-    double rotation = 0;
-    LatLng lastPosition = this.state.myLocation;
-    if (lastPosition != null) {
-      rotation = getCoordsRotation(event.location, lastPosition);
-    }
-
-    final Marker myPositionMarker = (await this._myPositionMarker.future)
-        .copyWith(positionParam: event.location, rotationParam: rotation);
-
-    markers[myPositionMarker.markerId] = myPositionMarker;
-
     yield this.state.copyWith(
-        loading: false,
-        myLocation: event.location,
-        polylines: polylines,
-        markers: markers);
+          loading: false,
+          myLocation: event.location,
+        );
   }
 //---------------------------------------------------------------------------------
 
-  Stream<HomeState> _mapOnMapTap(OnMapTap event) async* {
-    final markerId = MarkerId(this.state.markers.length.toString());
-    final info = InfoWindow(
-      title: "Hola Marcador ${markerId.value}",
-      snippet: "La dirección es buena",
-    );
-
-    final Uint8List bytes = await loadAsset('assets/car-pin.png', width: 50);
-
-    //final Uint8List bytes = await loadimageFromNetwork(
-    //  'https://cdn.iconscout.com/icon/free/png-256/google-470-675827.png',
-    //width: 50,
-    //height: 95);
-    final customIcon = BitmapDescriptor.fromBytes(bytes);
-
-    final marker = Marker(
-        markerId: markerId,
-        position: event.location,
-        icon: customIcon,
-        onTap: () {
-          print("## MARCADOR  ${markerId.value} ##");
-        },
-        draggable: true,
-        onDragEnd: (newPosition) {
-          print(
-              "## MARCADOR Nueva Posicion  ${markerId.value} ##  $newPosition");
-        },
-        infoWindow: info);
-
-    final markers = Map<MarkerId, Marker>.from(this.state.markers);
-    markers[markerId] = marker;
-    yield this.state.copyWith(markers: markers);
-  }
 }
