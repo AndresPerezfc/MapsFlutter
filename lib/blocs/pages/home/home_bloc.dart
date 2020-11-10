@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps/blocs/pages/home/bloc.dart';
-import 'package:google_maps/utils/extras.dart';
+import 'package:google_maps/models/place.dart';
+
 import 'package:google_maps/utils/map_style.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location_permissions/location_permissions.dart';
@@ -57,7 +56,7 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
 
       _subscriptionGpsStatus =
           _locationPermissions.serviceStatus.listen((status) {
-        add(onGpsEnable(status == ServiceStatus.enabled));
+        add(OnGpsEnable(status == ServiceStatus.enabled));
       });
     }
   }
@@ -72,6 +71,11 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
   }
 
   //-------------------------------------------------------------------
+
+  goToPlace(Place place) async {
+    final CameraUpdate cameraUpdate = CameraUpdate.newLatLng(place.position);
+    await (await _mapController).animateCamera(cameraUpdate);
+  }
 
   //-------------------------------------------------------------------
 
@@ -90,7 +94,7 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
   Stream<HomeState> mapEventToState(HomeEvents event) async* {
     if (event is OnMyLocationUpdate) {
       yield* this._mapOnMyLocationUpdate(event);
-    } else if (event is onGpsEnable) {
+    } else if (event is OnGpsEnable) {
       yield this.state.copyWith(gpsEnable: event.enabled);
     }
   }

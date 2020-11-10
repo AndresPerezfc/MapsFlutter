@@ -14,8 +14,8 @@ class OnMapTap extends HomeEvents {
   OnMapTap(this.location);
 }
 
-class onGpsEnable extends HomeEvents {
+class OnGpsEnable extends HomeEvents {
   final bool enabled;
 
-  onGpsEnable(this.enabled);
+  OnGpsEnable(this.enabled);
 }

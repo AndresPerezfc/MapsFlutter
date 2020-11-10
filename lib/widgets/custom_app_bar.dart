@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_html/style.dart';
+
 import 'package:google_maps/api/search_api.dart';
 import 'package:google_maps/blocs/pages/home/bloc.dart';
 import 'package:google_maps/models/place.dart';
@@ -30,10 +29,14 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
                       Icon(Icons.search),
                     ],
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     SearchPlacesDelegate delegate =
                         SearchPlacesDelegate(state.myLocation);
-                    showSearch(context: context, delegate: delegate);
+                    final Place place = await showSearch<Place>(
+                        context: context, delegate: delegate);
+                    if (place != null) {
+                      bloc.goToPlace(place);
+                    }
                   },
                 )
               ],
@@ -48,7 +51,7 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
   Size get preferredSize => Size(double.infinity, 50);
 }
 
-class SearchPlacesDelegate extends SearchDelegate {
+class SearchPlacesDelegate extends SearchDelegate<Place> {
   final LatLng at;
   final SearchApi _api = SearchApi.instance;
 
@@ -87,6 +90,7 @@ class SearchPlacesDelegate extends SearchDelegate {
                 itemBuilder: (__, index) {
                   final Place place = snapshot.data[index];
                   return ListTile(
+                    onTap: () => this.close(context, place),
                     title: Text(
                       place.title,
                       style: TextStyle(fontWeight: FontWeight.bold),
