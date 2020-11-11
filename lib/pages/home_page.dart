@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps/widgets/centered_marker.dart';
 
 import 'package:google_maps/widgets/custom_app_bar.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -59,6 +60,7 @@ class _HomePageState extends State<HomePage> {
                       CameraPosition(target: state.myLocation, zoom: 17);
 
                   return Stack(
+                    alignment: Alignment.center,
                     children: [
                       GoogleMap(
                         initialCameraPosition: initialPosition,
@@ -80,7 +82,8 @@ class _HomePageState extends State<HomePage> {
                               _bloc.goToMyPosition();
                             },
                             child: Icon(Icons.gps_fixed),
-                          ))
+                          )),
+                      CenteredMarker(),
                     ],
                   );
                 },

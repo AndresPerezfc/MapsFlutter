@@ -50,6 +50,9 @@ class HomeBloc extends Bloc<HomeEvents, HomeState> {
       if (position != null) {
         final newPosition = LatLng(position.latitude, position.longitude);
         add(OnMyLocationUpdate(newPosition));
+
+        final CameraUpdate cameraUpdate = CameraUpdate.newLatLng(newPosition);
+        await (await _mapController).animateCamera(cameraUpdate);
       }
     });
 
