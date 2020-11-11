@@ -83,7 +83,9 @@ class _HomePageState extends State<HomePage> {
                             },
                             child: Icon(Icons.gps_fixed),
                           )),
-                      CenteredMarker(),
+                      CenteredMarker(
+                        label: state.arrival != null ? state.arrival.title : "",
+                      ),
                     ],
                   );
                 },

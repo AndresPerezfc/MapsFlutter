@@ -13,13 +13,16 @@ class HomeState extends Equatable {
 
   final Map<String, Place> history;
 
+  final Place arrival;
+
   HomeState(
       {this.myLocation,
       this.loading = true,
       this.markers,
       this.gpsEnable,
       this.polylines,
-      this.history});
+      this.history,
+      this.arrival});
 
   static HomeState get initialState => new HomeState(
       myLocation: null,
@@ -35,17 +38,19 @@ class HomeState extends Equatable {
       Map<MarkerId, Marker> markers,
       bool gpsEnable,
       Map<PolylineId, Polyline> polylines,
-      Map<String, Place> history}) {
+      Map<String, Place> history,
+      Place arrival}) {
     return HomeState(
         myLocation: myLocation ?? this.myLocation,
         loading: loading ?? this.loading,
         markers: markers ?? this.markers,
         gpsEnable: gpsEnable ?? this.gpsEnable,
         polylines: polylines ?? this.polylines,
-        history: history ?? this.history);
+        history: history ?? this.history,
+        arrival: arrival ?? this.arrival);
   }
 
   @override
   List<Object> get props =>
-      [myLocation, loading, markers, gpsEnable, polylines, history];
+      [myLocation, loading, markers, gpsEnable, polylines, history, arrival];
 }
